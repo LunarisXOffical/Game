@@ -1,0 +1,45 @@
+local Junkie = loadstring(game:HttpGet("https://jnkie.com/sdk/library.lua"))()
+Junkie.service = "test"
+Junkie.identifier = "546" 
+Junkie.provider = "WorkInk"
+
+-- UI Implementation
+local validatedKey = nil
+
+-- Show custom UI 
+local function showUI()
+    local link = Junkie.get_key_link()
+    if link then
+        setclipboard(link)  -- Copy to clipboard
+        print("Link copied to clipboard!")
+    else
+        warn("Wait 5 minutes")
+        return nil
+    end
+    
+    -- Wait for user to input key (your UI logic here)
+    local userKey = promptUserForKey()  -- Replace with your UI input
+    
+    if userKey then
+        local validation = Junkie.check_key(userKey)
+        if validation.success then
+            return userKey
+        else
+            warn("Error: " .. (validation.error or "Invalid key"))
+            return nil
+        end
+    end
+end
+
+validatedKey = showUI()
+
+if not validatedKey then
+    warn("No valid key provided")
+    return
+end
+
+-- Store key globally for Junkie script to use
+getgenv().SCRIPT_KEY = validatedKey
+
+-- Now load the actual Junkie script
+loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/15f465ee60342132491cef9599ab1d1d0708c408a60699a8fecda99e5b36f25d/download"))()
