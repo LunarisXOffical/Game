@@ -1,45 +1,67 @@
 local Junkie = loadstring(game:HttpGet("https://jnkie.com/sdk/library.lua"))()
-Junkie.service = "test"
-Junkie.identifier = "546" 
-Junkie.provider = "WorkInk"
+Junkie.service = "Premium Hub"
+Junkie.identifier = "12345"
+Junkie.provider = "Mixed"
 
--- UI Implementation
-local validatedKey = nil
+local maxAttempts = 5
+local attempts = 0
+local validated = false
 
--- Show custom UI 
-local function showUI()
+while not validated and attempts < maxAttempts do
     local link = Junkie.get_key_link()
     if link then
-        setclipboard(link)  -- Copy to clipboard
-        print("Link copied to clipboard!")
-    else
-        warn("Wait 5 minutes")
-        return nil
-    end
-    
-    -- Wait for user to input key (your UI logic here)
-    local userKey = promptUserForKey()  -- Replace with your UI input
-    
-    if userKey then
-        local validation = Junkie.check_key(userKey)
-        if validation.success then
-            return userKey
-        else
-            warn("Error: " .. (validation.error or "Invalid key"))
-            return nil
+        if setclipboard then
+            setclipboard(link)
         end
+    else
+        warn("Please wait 5 minutes")
     end
+    
+    -- Get user input (replace with your UI)
+    print("\nEnter your key:")
+    local userKey = getUserInput()  -- Your UI logic
+    
+    if userKey and #userKey > 0 then
+        attempts = attempts + 1
+        
+        local validation = Junkie.check_key(userKey)
+        if validation.valid then
+            validated = true
+            getgenv().SCRIPT_KEY = userKey
+            print("\nKey validated successfully!")
+            break
+        else
+            local errorMsg = validation.message or "Unknown error"
+            warn("[ERROR] " .. errorMsg)
+            
+            -- Handle specific backend error messages
+            if errorMsg == "KEY_EXPIRED" then
+                print("[INFO] Key expired - get a new one")
+            elseif errorMsg == "HWID_BANNED" then
+                game.Players.LocalPlayer:Kick("Hardware banned")
+                return
+            elseif errorMsg == "SERVICE_MISMATCH" then
+                print("[INFO] Key is for a different service")
+            elseif errorMsg == "HWID_MISMATCH" then
+                print("[INFO] HWID limit reached")
+            end
+        end
+    else
+        warn("Error: No key entered")
+    end
+    
+    if attempts >= maxAttempts then
+        warn("Error: Too many failed attempts!")
+        return
+    end
+    
+    task.wait(1)
 end
 
-validatedKey = showUI()
-
-if not validatedKey then
-    warn("No valid key provided")
+if not validated then
+    warn("Error: Validation failed")
     return
 end
 
--- Store key globally for Junkie script to use
-getgenv().SCRIPT_KEY = validatedKey
-
--- Now load the actual Junkie script
+-- Load main script
 loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/15f465ee60342132491cef9599ab1d1d0708c408a60699a8fecda99e5b36f25d/download"))()
