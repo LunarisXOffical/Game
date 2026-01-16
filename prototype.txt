@@ -1,0 +1,371 @@
+-- SIMPLE WORKING Junkie External Loader
+-- This bypasses complex UI issues
+
+print("🔑 Junkie Simple Loader v1.0")
+
+-- Configuration
+local SERVICE_NAME = "test"  -- Change this
+local IDENTIFIER = "546"     -- Change this
+local PROVIDER = "WorkInk"   -- Change this
+local MAIN_SCRIPT_URL = "https://api.jnkie.com/api/v1/luascripts/public/15f465ee60342132491cef9599ab1d1d0708c408a60699a8fecda99e5b36f25d/download"
+
+-- Function to create a simple input UI
+local function createSimpleUI()
+    local UserInputService = game:GetService("UserInputService")
+    local RunService = game:GetService("RunService")
+    
+    -- Create UI
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "SimpleJunkieUI"
+    screenGui.Parent = game:GetService("CoreGui") or game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    
+    -- Background
+    local background = Instance.new("Frame")
+    background.Size = UDim2.fromScale(1, 1)
+    background.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    background.BackgroundTransparency = 0.3
+    background.Parent = screenGui
+    
+    -- Main window
+    local main = Instance.new("Frame")
+    main.Size = UDim2.new(0, 400, 0, 300)
+    main.Position = UDim2.new(0.5, -200, 0.5, -150)
+    main.AnchorPoint = Vector2.new(0.5, 0.5)
+    main.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+    main.BorderSizePixel = 0
+    main.Parent = screenGui
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 12)
+    corner.Parent = main
+    
+    -- Title
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, -40, 0, 50)
+    title.Position = UDim2.new(0, 20, 0, 20)
+    title.BackgroundTransparency = 1
+    title.Text = "JUNKIE LOADER"
+    title.TextColor3 = Color3.fromRGB(59, 130, 246)
+    title.TextSize = 24
+    title.Font = Enum.Font.GothamBold
+    title.TextXAlignment = Enum.TextXAlignment.Left
+    title.Parent = main
+    
+    -- Input field
+    local inputFrame = Instance.new("Frame")
+    inputFrame.Size = UDim2.new(1, -40, 0, 50)
+    inputFrame.Position = UDim2.new(0, 20, 0, 100)
+    inputFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+    inputFrame.Parent = main
+    
+    local inputCorner = Instance.new("UICorner")
+    inputCorner.CornerRadius = UDim.new(0, 8)
+    inputCorner.Parent = inputFrame
+    
+    local inputBox = Instance.new("TextBox")
+    inputBox.Size = UDim2.new(1, -20, 1, -10)
+    inputBox.Position = UDim2.new(0, 10, 0, 5)
+    inputBox.BackgroundTransparency = 1
+    inputBox.Text = ""
+    inputBox.PlaceholderText = "Enter your license key here..."
+    inputBox.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
+    inputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+    inputBox.TextSize = 16
+    inputBox.Font = Enum.Font.Gotham
+    inputBox.TextXAlignment = Enum.TextXAlignment.Left
+    inputBox.Parent = inputFrame
+    
+    -- Buttons
+    local buttonFrame = Instance.new("Frame")
+    buttonFrame.Size = UDim2.new(1, -40, 0, 40)
+    buttonFrame.Position = UDim2.new(0, 20, 1, -120)
+    buttonFrame.BackgroundTransparency = 1
+    buttonFrame.Parent = main
+    
+    local copyBtn = Instance.new("TextButton")
+    copyBtn.Size = UDim2.new(0.48, 0, 1, 0)
+    copyBtn.Position = UDim2.new(0, 0, 0, 0)
+    copyBtn.BackgroundColor3 = Color3.fromRGB(59, 130, 246)
+    copyBtn.Text = "GET KEY LINK"
+    copyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    copyBtn.TextSize = 14
+    copyBtn.Font = Enum.Font.GothamBold
+    copyBtn.AutoButtonColor = false
+    copyBtn.Parent = buttonFrame
+    
+    local copyBtnCorner = Instance.new("UICorner")
+    copyBtnCorner.CornerRadius = UDim.new(0, 8)
+    copyBtnCorner.Parent = copyBtn
+    
+    local validateBtn = Instance.new("TextButton")
+    validateBtn.Size = UDim2.new(0.48, 0, 1, 0)
+    validateBtn.Position = UDim2.new(0.52, 0, 0, 0)
+    validateBtn.BackgroundColor3 = Color3.fromRGB(40, 200, 80)
+    validateBtn.Text = "VALIDATE"
+    validateBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    validateBtn.TextSize = 14
+    validateBtn.Font = Enum.Font.GothamBold
+    validateBtn.AutoButtonColor = false
+    validateBtn.Parent = buttonFrame
+    
+    local validateBtnCorner = Instance.new("UICorner")
+    validateBtnCorner.CornerRadius = UDim.new(0, 8)
+    validateBtnCorner.Parent = validateBtn
+    
+    -- Status label
+    local statusLabel = Instance.new("TextLabel")
+    statusLabel.Size = UDim2.new(1, -40, 0, 30)
+    statusLabel.Position = UDim2.new(0, 20, 0, 160)
+    statusLabel.BackgroundTransparency = 1
+    statusLabel.Text = "Status: Ready"
+    statusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    statusLabel.TextSize = 14
+    statusLabel.Font = Enum.Font.Gotham
+    statusLabel.TextXAlignment = Enum.TextXAlignment.Left
+    statusLabel.Parent = main
+    
+    -- Error label
+    local errorLabel = Instance.new("TextLabel")
+    errorLabel.Size = UDim2.new(1, -40, 0, 20)
+    errorLabel.Position = UDim2.new(0, 20, 1, -70)
+    errorLabel.BackgroundTransparency = 1
+    errorLabel.Text = ""
+    errorLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+    errorLabel.TextSize = 13
+    errorLabel.Font = Enum.Font.Gotham
+    errorLabel.TextXAlignment = Enum.TextXAlignment.Left
+    errorLabel.Visible = false
+    errorLabel.Parent = main
+    
+    -- Button hover effects
+    local function setupButton(button, defaultColor)
+        button.MouseEnter:Connect(function()
+            game:GetService("TweenService"):Create(button, TweenInfo.new(0.2), {BackgroundTransparency = 0.2}):Play()
+        end)
+        button.MouseLeave:Connect(function()
+            game:GetService("TweenService"):Create(button, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play()
+        end)
+    end
+    
+    setupButton(copyBtn, Color3.fromRGB(59, 130, 246))
+    setupButton(validateBtn, Color3.fromRGB(40, 200, 80))
+    
+    -- Function to show error
+    local function showError(message, isSuccess)
+        errorLabel.TextColor3 = isSuccess and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(255, 100, 100)
+        errorLabel.Text = isSuccess and "✓ " .. message or "✗ " .. message
+        errorLabel.Visible = true
+        
+        task.delay(3, function()
+            if errorLabel then
+                errorLabel.Visible = false
+            end
+        end)
+    end
+    
+    -- Get Key Link button
+    copyBtn.MouseButton1Click:Connect(function()
+        -- Try to load Junkie SDK
+        local success, Junkie = pcall(function()
+            return loadstring(game:HttpGet("https://jnkie.com/sdk/library.lua"))()
+        end)
+        
+        if not success or not Junkie then
+            showError("Failed to load Junkie SDK", false)
+            return
+        end
+        
+        -- Configure
+        Junkie.service = SERVICE_NAME
+        Junkie.identifier = IDENTIFIER
+        Junkie.provider = PROVIDER
+        
+        -- Get link
+        local linkSuccess, link = pcall(function()
+            return Junkie.get_key_link()
+        end)
+        
+        if linkSuccess and link then
+            if setclipboard then
+                setclipboard(link)
+                showError("Key link copied to clipboard!", true)
+            else
+                showError("Link: " .. link, true)
+            end
+        else
+            showError("Failed to get key link", false)
+        end
+    end)
+    
+    -- Validate button
+    validateBtn.MouseButton1Click:Connect(function()
+        local key = inputBox.Text:gsub("%s+", ""):upper()
+        
+        if #key < 5 then
+            showError("Please enter a valid key", false)
+            return
+        end
+        
+        -- Show loading
+        statusLabel.Text = "Status: Validating..."
+        validateBtn.Text = "..."
+        copyBtn.Active = false
+        validateBtn.Active = false
+        
+        -- Load Junkie SDK fresh each time
+        local success, Junkie = pcall(function()
+            return loadstring(game:HttpGet("https://jnkie.com/sdk/library.lua"))()
+        end)
+        
+        if not success or not Junkie then
+            showError("Failed to load Junkie SDK", false)
+            statusLabel.Text = "Status: Error"
+            validateBtn.Text = "VALIDATE"
+            copyBtn.Active = true
+            validateBtn.Active = true
+            return
+        end
+        
+        -- Configure
+        Junkie.service = SERVICE_NAME
+        Junkie.identifier = IDENTIFIER
+        Junkie.provider = PROVIDER
+        
+        -- Check key
+        local checkSuccess, result = pcall(function()
+            return Junkie.check_key(key)
+        end)
+        
+        -- Reset UI
+        validateBtn.Text = "VALIDATE"
+        copyBtn.Active = true
+        validateBtn.Active = true
+        
+        if not checkSuccess then
+            showError("API Error: " .. tostring(result), false)
+            statusLabel.Text = "Status: Error"
+            return
+        end
+        
+        if type(result) == "table" and result.valid then
+            -- ✅ SUCCESS: Save to getgenv().SCRIPT_KEY
+            getgenv().SCRIPT_KEY = key
+            showError("Key validated successfully!", true)
+            statusLabel.Text = "Status: ✓ Valid"
+            
+            -- Save to file
+            if writefile and type(writefile) == "function" then
+                pcall(function()
+                    writefile("junkie_key.txt", key)
+                end)
+            end
+            
+            -- Close UI and load main script
+            task.wait(1)
+            screenGui:Destroy()
+            print("✅ Key validated! Loading main script...")
+            loadstring(game:HttpGet(MAIN_SCRIPT_URL))()
+        else
+            local errorMsg = result and result.message or "Invalid key"
+            showError(errorMsg, false)
+            statusLabel.Text = "Status: Invalid"
+        end
+    end)
+    
+    -- Make window draggable
+    local dragging = false
+    local dragStart, startPos
+    
+    title.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = main.Position
+        end
+    end)
+    
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = input.Position - dragStart
+            main.Position = UDim2.new(
+                startPos.X.Scale, startPos.X.Offset + delta.X,
+                startPos.Y.Scale, startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+    
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = false
+        end
+    end)
+    
+    -- Focus input box
+    inputBox:CaptureFocus()
+    
+    return screenGui
+end
+
+-- Check for existing key first
+if getgenv().SCRIPT_KEY and type(getgenv().SCRIPT_KEY) == "string" and #getgenv().SCRIPT_KEY > 5 then
+    print("🔍 Checking existing SCRIPT_KEY...")
+    
+    -- Try to validate it
+    local success, Junkie = pcall(function()
+        return loadstring(game:HttpGet("https://jnkie.com/sdk/library.lua"))()
+    end)
+    
+    if success and Junkie then
+        Junkie.service = SERVICE_NAME
+        Junkie.identifier = IDENTIFIER
+        Junkie.provider = PROVIDER
+        
+        local checkSuccess, result = pcall(function()
+            return Junkie.check_key(getgenv().SCRIPT_KEY)
+        end)
+        
+        if checkSuccess and type(result) == "table" and result.valid then
+            print("✅ Using existing key from getgenv()")
+            loadstring(game:HttpGet(MAIN_SCRIPT_URL))()
+            return
+        else
+            print("❌ Existing key invalid")
+            getgenv().SCRIPT_KEY = nil
+        end
+    end
+end
+
+-- Check saved key file
+if readfile and isfile and isfile("junkie_key.txt") then
+    local savedKey = readfile("junkie_key.txt")
+    if savedKey and #savedKey > 5 then
+        print("🔍 Checking saved key from file...")
+        
+        local success, Junkie = pcall(function()
+            return loadstring(game:HttpGet("https://jnkie.com/sdk/library.lua"))()
+        end)
+        
+        if success and Junkie then
+            Junkie.service = SERVICE_NAME
+            Junkie.identifier = IDENTIFIER
+            Junkie.provider = PROVIDER
+            
+            local checkSuccess, result = pcall(function()
+                return Junkie.check_key(savedKey)
+            end)
+            
+            if checkSuccess and type(result) == "table" and result.valid then
+                getgenv().SCRIPT_KEY = savedKey
+                print("✅ Using saved key from file")
+                loadstring(game:HttpGet(MAIN_SCRIPT_URL))()
+                return
+            else
+                pcall(function() delfile("junkie_key.txt") end)
+            end
+        end
+    end
+end
+
+-- If no valid key found, show the UI
+print("📱 Showing key input UI...")
+createSimpleUI()
