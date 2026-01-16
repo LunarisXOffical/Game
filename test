@@ -1,7 +1,7 @@
 local Junkie = loadstring(game:HttpGet("https://jnkie.com/sdk/library.lua"))()
-Junkie.service = "Premium Hub"
-Junkie.identifier = "12345"
-Junkie.provider = "Mixed"
+Junkie.service = "test"
+Junkie.identifier = "546"
+Junkie.provider = "WorkInk"
 
 local maxAttempts = 5
 local attempts = 0
