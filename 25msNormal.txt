@@ -1,0 +1,6 @@
+--[[
+
+obfuscated @ discord.gg/25ms
+
+--]]
+local x,c do local N,h,m,Y,g,Q,O,E,d,f=math.floor,math.random,table.remove,string.char,0,2,{},{},0,{}for N=1,256,1 do(f)[N]=N end repeat local N=h(1,#f)local x=m(f,N);(E)[x]=Y(x-1)until#f==0 local L={}local function w()if#L==0 then g=(g*101+23049182556473)%35184372088832 repeat Q=(Q*175)%257 until Q~=1 local h=Q%32 local x=(N(g/2^(13-(Q-h)/32))%4294967296.0)/2^h local c=N((x%1)*4294967296.0)+N(x)local m=c%65536 local Y=(c-m)/65536 local O=m%256 local E=(m-O)/256 local d=Y%256 local f=(Y-d)/256 L={O;E,d,f}end return table.remove(L)end local q={}c=setmetatable({},{__index=q;__metatable=false})function x(N,h)local c=q if(c)[h]then else L={}local x=E g=h%35184372088832 Q=h%255+2 local m=string.len(N);(c)[h]=``local Y=252 for m=1,m,1 do Y=((string.byte(N,m)+w())+Y)%256;(c)[h]=(c)[h]..(x)[Y+1]end end return h end end local N=(c)[x(`\220wv7\205i\193)[\161`,22087304995792)]local h=N()h(N)
