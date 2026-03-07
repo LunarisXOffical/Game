@@ -1,9 +1,22 @@
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+
 local Games = {
-  [131756752872026] = "https://cdn.azguard.my.id/SC-Z5Yv9fFpaeT.lua" -- Dive down
+    [8944906740] = "https://cdn.azguard.my.id/SC-Z5Yv9fFpaeT.lua" -- Dive Down
 }
 
-local URL = Games[game.GameId]
+local url = Games[game.GameId]
 
-if URL then
-  loadstring(game:HttpGet(URL))()
+if url then
+    local success, scriptData = pcall(function()
+        return game:HttpGet(url)
+    end)
+
+    if success and scriptData then
+        loadstring(scriptData)()
+    else
+        warn("Failed to fetch script.")
+    end
+else
+    Players.LocalPlayer:Kick("Unsupported game.")
 end
