@@ -2,7 +2,7 @@ local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 
 local Games = {
-	[8944906740] = "https://cdn.azguard.my.id/SC-Z5Yv9fFpaeT.lua" -- Dive Down
+	[8944906740] = "https://cdn.azguard.my.id/SC-Z5Yv9fFpaeT.lua" -- Dive Down fr
 }
 
 local url = Games[game.GameId]
